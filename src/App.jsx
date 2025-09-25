@@ -27,7 +27,7 @@ function App() {
   // Updates specific fields
       await updateDoc(docRef, {
         age: "36",
-        name: "Johnny Kenton"
+        name: "That guy"
       })
 
     if (docSnap.exists()) {
