@@ -1,6 +1,7 @@
 import './App.css';
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
+import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 
 const firebaseConfig = {
@@ -15,11 +16,30 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 function App() {
-  const [name, setName] = useState();
+//  const [name, setName] = useState();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
+    // Check the user's authentication state when the app loads
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        // User is signed in
+        setUser(currentUser);
+      } else {
+        // User is signed out
+        setUser(null)
+      }
+    })
+
+    return () => unsubscribe();
+  })
+
+  /* useEffect(() => {
     async function testFirestore()  {
       const docRef = doc(db, "testCollection", "testDocument");
       const docSnap = await getDoc(docRef);
@@ -38,11 +58,73 @@ function App() {
   }
 
   testFirestore();
-}, []);
+}, []); */
+
+
+// Sign up
+const signUp = () => {
+  createUserWithEmailAndPassword(auth, email, password)
+  .then(userCredential => {
+    setUser(userCredential.user);
+    console.log('User signed in:', userCredential.user);
+  })
+  .catch(error => {
+    console.error('Error signing up:', error);
+  });
+}
+
+// Sign In
+const signIn = () => {
+  signInWithEmailAndPassword(auth, email, password)
+  .then(userCredential => {
+    setUser(userCredential.user);
+    console.log('User signed up:', userCredential.user);
+  })
+  .catch(error => {
+    console.error('Error signing up:', error);
+  });
+}
+
+// Sign Out
+const logOut = () => {
+  signOut(auth)
+  .then(() => {
+    setUser(null);
+    console.log('User signed out');
+  })
+  .catch(error => {
+    console.error('Error signing out:', error);
+  });
+}
+
+
 
   return (
     <>
-     <p>Firestore Check {name}</p>
+     <p>Firestore Authentication</p>
+
+     <div>
+      {
+        !user && (
+          <>
+          <input type="text" placeholder='Email' value={email} onChange={(event) => setEmail(event.target.value)} />
+          <input type="password" placeholder='Password' value={password} onChange={(event) => setPassword(event.target.value)} />
+            <button onClick={signUp}>Sign up</button>
+            <button onClick={signIn}>Sign in</button>
+          </>
+        )
+      }
+     </div>
+
+    {
+      user && (
+        <div>
+          <p>Logged in as: {user.email}</p>
+          <button onClick={logOut}>Sign out</button>
+        </div>
+      )
+    }
+
     </>
   )
 }
