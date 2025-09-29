@@ -105,7 +105,7 @@ const logOut = () => {
       user && (
         <div>
           <Todo />
-          <p>Logged in as: {user.email}</p>
+          <p className='loggedInAs'>Logged in as: {user.email}</p>
           <button onClick={logOut}>Sign out</button>
         </div>
       )

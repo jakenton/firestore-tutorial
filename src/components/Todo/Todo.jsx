@@ -57,7 +57,7 @@ const Todo = () => {
         <>
             <div>
                 <h1>Todo</h1>
-                <input type="text" value={newTodo} onChange={(event) => setNewTodo(event.target.value)} />
+                <input type="text" placeholder='What do you need to do?' value={newTodo} onChange={(event) => setNewTodo(event.target.value)} />
                 <button onClick={addTodo}>Add Todo</button>
             </div>
             <ul>
